@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import net.firstinstance.journalapp.Entity.User;
 
+@Repository
 public interface UserRepo extends MongoRepository<User, ObjectId> {
 
     User findByUsername(String username);
