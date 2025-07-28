@@ -30,13 +30,14 @@ public class JournalController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/get/{username}")
+    //small bug fixed, but cannot access the journalentries, i believe that there is no database made for this but when i push "user/get" can access it
+    @GetMapping("/get/user/{username}")
     public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String username) {
-        User user = userService.findByUserName(username);
-        if (user == null) {
+        User userservice = userService.findByUserName(username);
+        if (userservice == null) {
             return ResponseEntity.status(404).body("User not found.");
         }
-        List<JournalEntity> journalEntries = user.getJournalEntries();
+        List<JournalEntity> journalEntries = userservice.getJournalEntries();
         if (journalEntries == null || journalEntries.isEmpty()) {
             return ResponseEntity.status(404).body("No journal entries found for the user.");
         }
@@ -71,8 +72,8 @@ public class JournalController {
         if(oldEntry != null) {
             oldEntry.setTitle(journalEntry.getTitle()!= null && !journalEntry.getTitle().equals("") ? journalEntry.getTitle() :  oldEntry.getTitle());
             oldEntry.setContent(journalEntry.getContent() != null && !journalEntry.getContent().equals("") ? journalEntry.getContent() : oldEntry.getContent());
+            journalService.updateJournalEntry(oldEntry);
         }
-
         return journalEntry;
     }
 }

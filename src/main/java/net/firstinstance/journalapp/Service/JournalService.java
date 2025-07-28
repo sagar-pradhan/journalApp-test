@@ -25,7 +25,7 @@ public class JournalService {
         User user = userService.findByUserName(username);
         journalEntry.setDate(LocalDateTime.now());
         JournalEntity saved = journalRepo.save(journalEntry);
-        User.getJournalEntries().add(saved);
+        user.getJournalEntries().add(saved);
         userService.saveUserEntry(user);
     }
 
@@ -41,6 +41,10 @@ public class JournalService {
 
     public Optional<JournalEntity> findUsingId(ObjectId myId) {
         return journalRepo.findById(myId);
+    }
+
+    public void updateJournalEntry(JournalEntity oldEntry) {
+        journalRepo.save(oldEntry);
     }
 
 
