@@ -24,6 +24,7 @@ public class JournalService {
     public void saveJournalEntry(JournalEntity journalEntry, String username) {
         User user = userService.findByUserName(username);
         journalEntry.setDate(LocalDateTime.now());
+        journalEntry.setContent(journalEntry.getContent() != null ? journalEntry.getContent() : " ");
         JournalEntity saved = journalRepo.save(journalEntry);
         user.getJournalEntries().add(saved);
         userService.saveUserEntry(user);
