@@ -21,13 +21,46 @@ public class JournalService {
     @Autowired
     private UserService userService;    //Injecting UserService to the Service class
 
-    public void saveJournalEntry(JournalEntity journalEntry, String username) {
-        User user = userService.findByUserName(username);
-        journalEntry.setDate(LocalDateTime.now());
-        journalEntry.setContent(journalEntry.getContent() != null ? journalEntry.getContent() : " ");
-        JournalEntity saved = journalRepo.save(journalEntry);
-        user.getJournalEntries().add(saved);
-        userService.saveUserEntry(user);
+    public boolean saveJournalEntry(JournalEntity journalEntry, String username) {
+        try {
+            User user = userService.findByUserName(username);
+            if (user == null) {
+                return false; // User not found
+            }
+            
+            // Validate journal entry
+            if (journalEntry.getTitle() == null || journalEntry.getTitle().trim().isEmpty()) {
+                return false; // Title is required
+            }
+            
+            journalEntry.setDate(LocalDateTime.now());
+            journalEntry.setContent(journalEntry.getContent() != null ? journalEntry.getContent().trim() : "");
+            JournalEntity saved = journalRepo.save(journalEntry);
+            user.getJournalEntries().add(saved);
+            userService.saveUserEntry(user);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean deleteJournalEntryById(ObjectId id, String username) {
+        try {
+            User user = userService.findByUserName(username);
+            if (user == null) {
+                return false;
+            }
+            
+            // Remove from user's journal list first
+            user.getJournalEntries().removeIf(entry -> entry.getId().equals(id));
+            userService.saveUserEntry(user);
+            
+            // Then delete the journal entry
+            journalRepo.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void deleteJournalEntryById(ObjectId id) {
